@@ -8,16 +8,16 @@ Pytorch original implementation of [DOBF: A Deobfuscation Pre-Training Objective
 
 ### Pre-trained Models 
 
-We provide DOBF models with the same architecture as codeBERT and graphCodeBERT (to be comparable on downstream tasks)
+We provide DOBF models with the same architecture and BPE model as codeBERT and graphCodeBERT and RoBERTa (to be comparable on downstream tasks).
 
-- [MLM](https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/mlm.pth)
+- [MLM](https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/mlm_roberta_size.pth)
 - [DOBF init scratch](https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/dobf_init_scratch.pth)
 - [DOBF model](https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/dobf.pth)
 - [DOBF+DAE model](https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/dobf_plus_denoising.pth)
 
 In command line:
 ```angular2html
-wget https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/mlm.pth
+wget https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/mlm_roberta_size.pth
 wget https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/dobf_init_scratch.pth
 wget https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/dobf.pth
 wget https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/dobf_plus_denoising.pth
@@ -56,9 +56,9 @@ python -m codegen_sources.preprocessing.preprocess
 
 Note that is your data is small enough to fit on a single GPU, then NGPU=1 and loading this single split on all GPU is the normal thing to do. Note also that if you run you training on multiple machine, each with NGPU GPUS, splitting in NGPU is fine as well. You will just have to precise ``` --split_data_accross_gpu local ``` in your training parameters. In our case, we add 4 machines of 8 GPU each, we set NPU=8 and ``` --split_data_accross_gpu local ```. 
 
-Note that you cannot learn bpe codes on obfuscated data, so you either use the bpe codes we provide, or you learn codes running the monolingual pipeline.
+Note that you cannot learn bpe codes on obfuscated data, so you can either use the bpe codes we provide, or learn BPE codes running the monolingual pipeline.
 
-Note that if you can also use roberta_bpe instead of fast_bpe. The bpe of roberta doesnt require codes de to be learnt.
+Note that if you can also use roberta_bpe instead of fast_bpe. The bpe of roberta doesn't require to learn BPE codes.
 
 
 ### Train
@@ -217,6 +217,7 @@ python train.py
 --optimizer 'adam_inverse_sqrt,warmup_updates=10000,lr=0.0001,weight_decay=0.01' \
 --eval_bleu true \
 --eval_computation true \
+--has_sentences_ids true
 --generate_hypothesis true \
 --save_periodic 1 \
 --validation_metrics 'valid_python_sa-java_sa_mt_comp_acc'  

@@ -15,12 +15,14 @@ Models used in TransCoder original paper are the following:
  - [TransCoder_model_1](https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/TransCoder_model_1.pth) for C++ -> Java, Java -> C++ and Java -> Python
  - [TransCoder_model_2](https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/TransCoder_model_2.pth) for C++ -> Python, Python -> C++ and Python -> Java
 
+Note: if you really want the output of these models to be exactly right, you need to change the constant [LAYER_NORM_EPSILON](../codegen_sources/model/src/model/transformer.py#L17) to be `1e-12` instead of `1e-5`. If you don't, the result will be the same in more than 99% of the cases and only slightly different otherwise.
+
 [Update:] Better model for translating between java and python (pretrained with our new model DOBF - 2021):
  - [translator_transcoder_size_from_DOBF](https://dl.fbaipublicfiles.com/transcoder/pre_trained_models/translator_transcoder_size_from_DOBF.pth)
 
 Its computational accuracy (CA@1) scores are 39.5% for Python -> Java (44.7% with beam size 10) and 49.2% for Java -> Python (52.5% with beam size 10).  
    
-You can use these models to translate functions with [this script](codegen_sources/model/translate.py):
+You can use these models to translate functions with [this script](../codegen_sources/model/translate.py):
 
 ```bash
 python -m codegen_sources.model.translate --src_lang python --tgt_lang java --model_path <model_path> --beam_size 1 < my_python_file_to_translate.py
@@ -168,6 +170,7 @@ python train.py
 --optimizer 'adam_inverse_sqrt,warmup_updates=10000,lr=0.0001,weight_decay=0.01' \
 --eval_bleu true \
 --eval_computation true \
+--has_sentences_ids true \
 --generate_hypothesis true \
 --save_periodic 1 \
 --validation_metrics 'valid_python_sa-java_sa_mt_comp_acc'  
